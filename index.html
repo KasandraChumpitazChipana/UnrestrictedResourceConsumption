@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo: Unrestricted Resource Consumption</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ Demo: Unrestricted Resource Consumption</h1>
+            <p>Microservicio de Usuarios - Vulnerabilidad y Solución</p>
+        </div>
+
+        <!-- Explicación de la Vulnerabilidad -->
+        <div class="demo-section">
+            <h2 class="section-title">
+                <span class="vulnerability-icon">⚠️</span>
+                ¿Qué es Unrestricted Resource Consumption?
+            </h2>
+            <p style="font-size: 1.1em; line-height: 1.6; color: #34495e;">
+                Es una vulnerabilidad que ocurre cuando una aplicación no limita adecuadamente el uso de recursos del sistema (CPU, memoria, ancho de banda, almacenamiento). 
+                Esto permite a atacantes realizar ataques de denegación de servicio (DoS) consumiendo todos los recursos disponibles.
+            </p>
+            
+            <div style="margin-top: 20px;">
+                <h3 style="color: #e74c3c; margin-bottom: 10px;">Vectores de Ataque en el Microservicio Usuario:</h3>
+                <ul style="margin-left: 30px; line-height: 1.8;">
+                    <li><strong>Creación masiva de usuarios:</strong> Registrar miles de usuarios simultáneamente</li>
+                    <li><strong>Subida de imágenes enormes:</strong> Abusar del campo userImage</li>
+                    <li><strong>Consultas sin paginación:</strong> Solicitar todos los usuarios de una vez</li>
+                    <li><strong>Ataques de fuerza bruta:</strong> Intentos masivos de login</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Demo Interactiva -->
+        <div class="demo-section">
+            <h2 class="section-title">
+                <span class="vulnerability-icon">🎯</span>
+                Demostración Interactiva
+            </h2>
+            
+            <div class="demo-grid">
+                <!-- Sistema Vulnerable -->
+                <div class="demo-card vulnerable">
+                    <h3>🔓 Sistema Vulnerable</h3>
+                    <p>Sin protecciones ni límites de recursos</p>
+                    
+                    <div class="attack-controls">
+                        <div class="control-group">
+                            <label>Tipo de Ataque:</label>
+                            <select id="attackType">
+                                <option value="mass_registration">Registro Masivo de Usuarios</option>
+                                <option value="large_images">Subida de Imágenes Grandes</option>
+                                <option value="unlimited_queries">Consultas Sin Límite</option>
+                                <option value="brute_force">Ataques de Fuerza Bruta</option>
+                            </select>
+                        </div>
+                        
+                        <div class="control-group">
+                            <label>Intensidad del Ataque:</label>
+                            <input type="range" id="attackIntensity" min="1" max="100" value="10">
+                            <span id="intensityValue">10</span> requests/segundo
+                        </div>
+                        
+                        <button class="attack-btn" onclick="startAttack()">🚀 Iniciar Ataque</button>
+                        <button class="attack-btn" onclick="stopAttack()" style="background: #95a5a6;">⏹️ Detener</button>
+                    </div>
+                    
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-value" id="requestCount">0</div>
+                            <div class="metric-label">Requests Enviadas</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value" id="memoryUsage">45%</div>
+                            <div class="metric-label">Uso de Memoria</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value" id="cpuUsage">20%</div>
+                            <div class="metric-label">Uso de CPU</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value" id="responseTime">150ms</div>
+                            <div class="metric-label">Tiempo Respuesta</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill danger" id="systemLoad"></div>
+                    </div>
+                    <div style="text-align: center; margin-top: 5px;">
+                        <span class="status-indicator" id="systemStatus"></span>
+                        Estado del Sistema: <span id="systemStatusText">Normal</span>
+                    </div>
+                </div>
+
+                <!-- Sistema Protegido -->
+                <div class="demo-card secure">
+                    <h3>🔒 Sistema Protegido</h3>
+                    <p>Con rate limiting y protecciones implementadas</p>
+                    
+                    <div class="attack-controls">
+                        <div class="control-group">
+                            <label>Protecciones Activas:</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                                <label style="display: flex; align-items: center; font-weight: normal;">
+                                    <input type="checkbox" id="rateLimiting" checked style="width: auto; margin-right: 8px;">
+                                    Rate Limiting
+                                </label>
+                                <label style="display: flex; align-items: center; font-weight: normal;">
+                                    <input type="checkbox" id="inputValidation" checked style="width: auto; margin-right: 8px;">
+                                    Validación Input
+                                </label>
+                                <label style="display: flex; align-items: center; font-weight: normal;">
+                                    <input type="checkbox" id="memoryLimits" checked style="width: auto; margin-right: 8px;">
+                                    Límites Memoria
+                                </label>
+                                <label style="display: flex; align-items: center; font-weight: normal;">
+                                    <input type="checkbox" id="pagination" checked style="width: auto; margin-right: 8px;">
+                                    Paginación
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button class="protect-btn" onclick="testProtections()">🛡️ Probar Protecciones</button>
+                    </div>
+                    
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-value" id="blockedRequests">0</div>
+                            <div class="metric-label">Requests Bloqueadas</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value" id="protectedMemory">25%</div>
+                            <div class="metric-label">Uso de Memoria</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value" id="protectedCpu">15%</div>
+                            <div class="metric-label">Uso de CPU</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value" id="protectedResponse">80ms</div>
+                            <div class="metric-label">Tiempo Respuesta</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="protectedLoad" style="width: 25%;"></div>
+                    </div>
+                    <div style="text-align: center; margin-top: 5px;">
+                        <span class="status-indicator status-normal" id="protectedStatus"></span>
+                        Estado del Sistema: <span id="protectedStatusText">Protegido</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logs del Sistema -->
+        <div class="demo-section">
+            <h2 class="section-title">
+                <span>📋</span>
+                Logs del Sistema
+            </h2>
+            <div class="log" id="systemLogs">
+                <div class="log-entry info">[INFO] Sistema iniciado - Microservicio Usuario v1.0</div>
+                <div class="log-entry info">[INFO] Configuraciones de seguridad cargadas</div>
+                <div class="log-entry success">[SUCCESS] Sistema listo para recibir requests</div>
+            </div>
+        </div>
+
+        <!-- Código Vulnerable y Solución -->
+        <div class="demo-section">
+            <h2 class="section-title">
+                <span class="solution-icon">💻</span>
+                Código: Vulnerable vs Seguro
+            </h2>
+            
+            <div class="code-section">
+                <div class="code-title">❌ Código Vulnerable - UserController.java</div>
+<pre>@RestController
+@RequestMapping("/api/users")
+public class UserController {
+    
+    @Autowired
+    private UserService userService;
+    
+    // ⚠️ VULNERABLE: Sin rate limiting
+    @PostMapping("/register")
+    public ResponseEntity&lt;User&gt; registerUser(@RequestBody User user) {
+        // Sin validación de tamaño de imagen
+        // Sin límites de requests por IP
+        User savedUser = userService.save(user);
+        return ResponseEntity.ok(savedUser);
+    }
+    
+    // ⚠️ VULNERABLE: Sin paginación
+    @GetMapping("/all")
+    public ResponseEntity&lt;List&lt;User&gt;&gt; getAllUsers() {
+        // Retorna TODOS los usuarios de una vez
+        List&lt;User&gt; users = userService.findAll();
+        return ResponseEntity.ok(users);
+    }
+    
+    // ⚠️ VULNERABLE: Sin protección brute force
+    @PostMapping("/login")
+    public ResponseEntity&lt;String&gt; login(@RequestBody LoginRequest request) {
+        // Sin límite de intentos por IP
+        boolean valid = userService.validateLogin(request);
+        return valid ? ResponseEntity.ok("Success") : 
+                      ResponseEntity.badRequest().body("Invalid");
+    }
+}</pre>
+            </div>
+
+            <div class="code-section">
+                <div class="code-title">✅ Código Seguro - UserController.java</div>
+<pre>@RestController
+@RequestMapping("/api/users")
+@RateLimiter(name = "userService", fallbackMethod = "rateLimitFallback")
+public class UserController {
+    
+    @Autowired
+    private UserService userService;
+    
+    // ✅ SEGURO: Con rate limiting y validaciones
+    @PostMapping("/register")
+    @RateLimiter(name = "registration", fallbackMethod = "registrationLimitFallback")
+    public ResponseEntity&lt;User&gt; registerUser(@Valid @RequestBody User user) {
+        // Validar tamaño de imagen
+        if (user.getUserImage() != null && 
+            user.getUserImage().length() > 5_000_000) { // 5MB max
+            throw new ValidationException("Imagen muy grande");
+        }
+        
+        User savedUser = userService.save(user);
+        return ResponseEntity.ok(savedUser);
+    }
+    
+    // ✅ SEGURO: Con paginación
+    @GetMapping("/all")
+    public ResponseEntity&lt;Page&lt;User&gt;&gt; getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        
+        if (size > 100) size = 100; // Límite máximo
+        
+        Pageable pageable = PageRequest.of(page, size);
+        Page&lt;User&gt; users = userService.findAll(pageable);
+        return ResponseEntity.ok(users);
+    }
+    
+    // ✅ SEGURO: Con protección brute force
+    @PostMapping("/login")
+    @RateLimiter(name = "login", fallbackMethod = "loginLimitFallback")
+    public ResponseEntity&lt;String&gt; login(@RequestBody LoginRequest request,
+                                        HttpServletRequest httpRequest) {
+        String clientIP = getClientIP(httpRequest);
+        
+        // Verificar intentos fallidos recientes
+        if (bruteForceProtectionService.isBlocked(clientIP)) {
+            return ResponseEntity.status(429)
+                .body("Too many failed attempts. Try again later.");
+        }
+        
+        boolean valid = userService.validateLogin(request);
+        
+        if (!valid) {
+            bruteForceProtectionService.registerFailedAttempt(clientIP);
+        } else {
+            bruteForceProtectionService.resetFailedAttempts(clientIP);
+        }
+        
+        return valid ? ResponseEntity.ok("Success") : 
+                      ResponseEntity.badRequest().body("Invalid credentials");
+    }
+    
+    // Fallback methods para rate limiting
+    public ResponseEntity&lt;String&gt; rateLimitFallback(Exception ex) {
+        return ResponseEntity.status(429)
+            .body("Rate limit exceeded. Please try again later.");
+    }
+}</pre>
+            </div>
+
+            <div class="code-section">
+                <div class="code-title">🔧 Configuración de Seguridad - application.yml</div>
+<pre>resilience4j:
+  ratelimiter:
+    instances:
+      userService:
+        limitForPeriod: 100          # 100 requests
+        limitRefreshPeriod: 60s      # por minuto
+        timeoutDuration: 3s
+      registration:
+        limitForPeriod: 5            # 5 registros
+        limitRefreshPeriod: 60s      # por minuto
+      login:
+        limitForPeriod: 10           # 10 intentos login
+        limitRefreshPeriod: 60s      # por minuto
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB           # Límite tamaño archivos
+      max-request-size: 10MB       # Límite request total
+  
+  datasource:
+    hikari:
+      maximum-pool-size: 10        # Límite conexiones DB
+      connection-timeout: 30000
+      
+server:
+  tomcat:
+    max-threads: 200              # Límite threads
+    max-connections: 8192         # Límite conexiones</pre>
+            </div>
+        </div>
+
+        <!-- Mitigaciones Recomendadas -->
+        <div class="demo-section">
+            <h2 class="section-title">
+                <span class="solution-icon">🛡️</span>
+                Mitigaciones Recomendadas
+            </h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div class="demo-card">
+                    <h4 style="color: #2c3e50; margin-bottom: 15px;">🚦 Rate Limiting</h4>
+                    <ul style="line-height: 1.6;">
+                        <li>Limitar requests por IP/usuario</li>
+                        <li>Diferentes límites por endpoint</li>
+                        <li>Usar Redis para estado distribuido</li>
+                        <li>Implementar sliding window</li>
+                    </ul>
+                </div>
+                
+                <div class="demo-card">
+                    <h4 style="color: #2c3e50; margin-bottom: 15px;">✅ Validación de Input</h4>
+                    <ul style="line-height: 1.6;">
+                        <li>Validar tamaño de archivos</li>
+                        <li>Limitar longitud de campos</li>
+                        <li>Sanitizar datos de entrada</li>
+                        <li>Usar @Valid y constraints</li>
+                    </ul>
+                </div>
+                
+                <div class="demo-card">
+                    <h4 style="color: #2c3e50; margin-bottom: 15px;">📄 Paginación</h4>
+                    <ul style="line-height: 1.6;">
+                        <li>Implementar paginación obligatoria</li>
+                        <li>Límite máximo por página</li>
+                        <li>Usar cursor-based pagination</li>
+                        <li>Índices optimizados en DB</li>
+                    </ul>
+                </div>
+                
+                <div class="demo-card">
+                    <h4 style="color: #2c3e50; margin-bottom: 15px;">🔒 Protección Brute Force</h4>
+                    <ul style="line-height: 1.6;">
+                        <li>Bloqueo temporal por IP</li>
+                        <li>CAPTCHA después de N intentos</li>
+                        <li>Monitoreo de patrones</li>
+                        <li>Alertas automáticas</li>
+                    </ul>
+                </div>
+                
+                <div class="demo-card">
+                    <h4 style="color: #2c3e50; margin-bottom: 15px;">📊 Monitoreo</h4>
+                    <ul style="line-height: 1.6;">
+                        <li>Métricas de uso de recursos</li>
+                        <li>Alertas por umbrales</li>
+                        <li>Logs estructurados</li>
+                        <li>Dashboards en tiempo real</li>
+                    </ul>
+                </div>
+                
+                <div class="demo-card">
+                    <h4 style="color: #2c3e50; margin-bottom: 15px;">⚙️ Configuración Sistema</h4>
+                    <ul style="line-height: 1.6;">
+                        <li>Límites JVM (heap, threads)</li>
+                        <li>Timeouts de conexión</li>
+                        <li>Pool de conexiones DB</li>
+                        <li>Circuit breakers</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
